@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sistema de Estoque</title>
+    <script>
+    </script>
+</head>   
+<body>
+    <div class="w-full h-full bg-gray-100 flex flex-row gap-6 p-6">
+        <!-- Sidebar -->
+        <div class="w-1/6 min-h-[95vh] bg-white rounded-2xl shadow-2xl p-4 flex flex-col"> 
+
+
+
+            <div class="w-full bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center gap-4">
+                <!-- Círculo para a imagem -->
+                <div class="w-24 h-24 bg-gray-300 rounded-full overflow-hidden">
+                    <img src="https://via.placeholder.com/150" alt="" class="w-full h-full object-cover">
+                </div>
+            
+                <!-- Nome do usuário -->
+                <h2 class="text-xl font-semibold text-gray-800">{{nome}}</h2>
+            
+                <!-- Cargo -->
+                <p class="text-gray-500 text-sm">{{cargo}}</p>
+
+            </div> 
+
+
+
+
+
+
+            <div class="flex flex-col gap-20 p-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-blue-500">Menu 🧑‍💻</h1>
+            
+                    <ul class="mt-4 flex flex-col gap-4">
+                        <li class="mb-2">
+                            <a href="#" class="text-blue-500 hover:text-blue-700">Ger. Produtos</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-blue-500 hover:text-blue-700">Pedidos</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-blue-500 hover:text-blue-700">Usuários</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-blue-500 hover:text-blue-700">Forcenedores</a>
+                        </li> 
+                        <li class="mb-2">
+                            <a href="#" class="text-blue-500 hover:text-blue-700">Estoque</a>
+                        </li>   
+                        <li class="mb-2">
+                            <a href="#" class="text-blue-500 hover:text-blue-700">Relatóirio</a>
+                        </li>  
+                    </ul>
+                </div>  
+
+
+            </div> 
+            <!-- Botão de Sair com imagem e texto -->
+            <div class="w-15 h-10 bg-blue-500 rounded-full flex flex-col items-center justify-center shadow-lg cursor-pointer hover:bg-gray-200 transition hover:text-blue-500"onclick="window.location.href='{{ url_for('logout') }}'">
+                <!-- Ícone de Sair -->
+                <p class="text-white hover:text-blue-500 text-lg flex items-center justify-center gap-2">Sair <span>⬅️</span></p>
+
+            </div>
+            
+        </div>
+
+        <!-- Main Content -->
+        <div class="w-full min-h-[90vh] flex flex-col gap-6">
+            <!-- Header -->
+            <div class="w-full min-h-[5vh] bg-blue-500 rounded-2xl shadow-lg flex items-center justify-center">
+                <h1 class="text-3xl font-bold text-white">📦 Sistema de Estoque</h1> 
+                <p></p>
+            </div>
+
+            <!-- Content Section -->
+            <div class="w-full h-full bg-white rounded-2xl shadow-2xl"></div>
+        </div>
+    </div>
+</body>
+
+</html>

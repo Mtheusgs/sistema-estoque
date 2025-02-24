@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from user import User
 
 app = Flask(__name__) 
@@ -6,7 +6,7 @@ app.secret_key= "12345"
 
 # Lista de usuários
 User.user_list = [ 
-    User('0', 'admin', 'admin', 'admin', 'admin'),
+    User('0', 'admin', 'Criador', 'admin', 'admin'),
     User("1", "Matheus", "Gerente", "thg", "12345"),
     User("2", "Maria", "Funcionário", "Mah", "123")
 ]
@@ -20,7 +20,9 @@ def index():
         senha = request.form.get("senha") 
 
         usuario_autenticado = User.login(usuario, senha)  # Aqui chamamos o método de classe corretamente
-        if usuario_autenticado:
+        if usuario_autenticado: 
+            session['nome'] = usuario_autenticado.UserName
+            session['cargo'] = usuario_autenticado.Cargo
             return redirect(url_for("dashboard"))
         else:
             mensagem = "Usuário ou senha incorretos!"
@@ -57,7 +59,17 @@ def register():
 
 @app.route("/dashboard")
 def dashboard():
-    return "<h1>Bem-vindo ao Painel de Controle!</h1>"
+    nome = session.get('nome', 'Usuário')
+    cargo = session.get('cargo', 'Cargo')
+    return render_template("dashboard.html", nome=nome, cargo=cargo) 
+
+
+@app.route("/logout")
+def logout():
+    session.clear()  # Limpa todos os dados da sessão
+    flash("Você saiu com sucesso!")
+    return redirect(url_for("index"))  # Redireciona para a página de login
+
 
 if __name__ == "__main__":
     app.run(debug=True)

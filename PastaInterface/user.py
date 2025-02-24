@@ -62,31 +62,8 @@ class Funcionario(User):
     pass
 
 
-def registrar(): 
-    """ Registra um novo usuário """
-    userid = input("Digite o ID do usuário: ")
-    username = input("Digite o nome do usuário: ")    
-    cargo = input("Digite o cargo do usuário: ")
-    login = input("Digite o login do usuário: ")
-    senha = input("Digite a senha do usuário: ")  
-    
-    # Criando o usuário corretamente (corrigindo a ordem dos argumentos)
-    novo_usuario = User(userid, username, cargo, senha, login)  
-    print(f"Usuário {username} cadastrado com sucesso!")
 
 
-def mostrarAtributo(escolha):
-    switcher = {
-        1: "UserId",
-        2: "UserName",
-        3: "Cargo",
-        4: "Login",
-        5: "Senha"
-    }
-    user= User.user_list[1]
-    print(f"ID: {user.UserId}, Nome: {user.UserName}, Cargo: {user.Cargo}, Login: {user.Login}, Senha: {user.Senha}")
-    atributo = int(input("Digite o número do atributo que deseja visualizar: "))
-    print(getattr(user, switcher.get(atributo)))
        
 
 
