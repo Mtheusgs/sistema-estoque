@@ -56,7 +56,11 @@
                         </li>   
                         <li class="mb-2">
                             <a href="#" class="text-blue-500 hover:text-blue-700">Relatóirio</a>
-                        </li>  
+                        </li>    
+                        <li class="mb-2">
+                            <a href="#" class="text-blue-500 hover:text-blue-700">Perfil</a>
+                        </li>
+
                     </ul>
                 </div>  
 
@@ -80,7 +84,36 @@
             </div>
 
             <!-- Content Section -->
-            <div class="w-full h-full bg-white rounded-2xl shadow-2xl"></div>
+            <div class="w-full h-full bg-white rounded-2xl shadow-2xl">
+
+                <h1>Lista de Produtos</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Código</th>
+                            <th>Quantidade</th>
+                            <th>Peso (Kg)</th>
+                            <th>Categoria</th>
+                            <th>Preço (R$)</th>
+                            <th>Fornecedor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in produtos %}
+                            <tr>
+                                <td>{{ produto.nome }}</td>
+                                <td>{{ produto.codigo }}</td>
+                                <td>{{ produto.quantidade }}</td>
+                                <td>{{ produto.peso }}</td>
+                                <td>{{ produto.categoria }}</td>
+                                <td>{{ produto.preco }}</td>
+                                <td>{{ produto.fornecedor }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
