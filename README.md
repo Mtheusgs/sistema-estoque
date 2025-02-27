@@ -1,6 +1,6 @@
 # Sistema de Estoque 📦
 
-Este projeto consiste em um sistema de controle de estoque desenvolvido para fins acadêmicos, utilizando as tecnologias **HTML**, **Tailwind CSS**, **Flask** e **Python**. O sistema permite o gerenciamento de produtos em estoque, com funcionalidades para adicionar, editar, excluir e visualizar produtos.
+Este projeto consiste em um sistema de controle de estoque desenvolvido para fins acadêmicos. O sistema permite o gerenciamento de produtos em estoque, com funcionalidades para adicionar, editar, excluir e visualizar produtos. Além disso, possibilita realizar pedidos, obter relatórios, gerir fornecedores e entre outras aplicabilidades.
 
 ## Tecnologias Utilizadas 🛠️
 
@@ -8,7 +8,9 @@ Este projeto consiste em um sistema de controle de estoque desenvolvido para fin
 - **Tailwind CSS**: Framework CSS para estilização rápida e responsiva.
 - **Flask**: Framework Python para desenvolvimento web.
 - **Python**: Linguagem utilizada para lógica de programação e manipulação de dados.
+- **JavaScript**: Linguagem para reorganizar atributos no HTML.
 - **POO (Programação Orientada a Objetos)**: Estruturação do código utilizando conceitos de classes e objetos.
+- **SQLite**: Banco de dados relacional utilizado para armazenar e gerenciar dados de forma eficiente.
 
 ## Funcionalidades Principais ⚙️
 
@@ -16,6 +18,9 @@ Este projeto consiste em um sistema de controle de estoque desenvolvido para fin
 - **Edição de Produtos** ✏️: Permite editar as informações dos produtos existentes.
 - **Exclusão de Produtos** 🗑️: Permite remover produtos do estoque.
 - **Listagem de Produtos** 📋: Exibe todos os produtos registrados no estoque com a opção de visualização detalhada.
+- **Pedidos**: Permite realizar pedidos conforme disponibilidade de produtos.
+- **Gerenciar Fornecedores**: Possibilita realizar cadastro de fornecedores, bem como, gerir os fornecedores já existentes.
+- **Obter Relatório**: Permite gerar relatórios com informes relevantes como entrada e saída de produtos, estoque, pedidos realizados e entre outros setores. 
 
 ## Como Rodar o Projeto 🚀
 
@@ -26,17 +31,28 @@ Este projeto consiste em um sistema de controle de estoque desenvolvido para fin
 
 ### Instalação 🛠️
 
-1. Clone o repositório:
+- Clone o repositório:
 
 ```bash
-git clone https://github.com/Projeto_POO_Sistema_de_Estoque.git
+git clone https://github.com/Mtheusgs/sistema-estoque.git
 cd sistema-estoque
-pip install -r requirements.txt
+````
+
+- Instale as dependências necessárias:
+
+```bash
+pip install SQLAlchemy
 pip install flask
+```
+
+- Com as dependências instaladas agora execute:
+
+```bash
 python app.py
+```
+## Estrutura do Repositório 📂
 
-
-
+```
 sistema-estoque/ 📂
 │
 ├── app.py                 # Arquivo principal da aplicação Flask
@@ -49,4 +65,7 @@ sistema-estoque/ 📂
 │   └── edit_product.html  # Página de edição de produtos
 └── models/                # Lógica de classes e manipulação de dados
     └── product.py         # Classe que representa um produto
+```
 
+---
+Esse projeto foi desenvolvido para aplicar na prática os conceitos de Programação Orientada a Objetos (POO), Desenvolvimento Web e entre outros conhecimentos relacionados.
