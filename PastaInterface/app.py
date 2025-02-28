@@ -64,43 +64,82 @@ def register():
         return redirect(url_for("index"))
     
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():  
-     
-    #produtos = Produto.query.all()
-
-    produtos = [
-    {"nome": "Notebook Dell", "codigo": "NB123", "quantidade": 10, "peso": 2.5, "categoria": "Eletrônicos", "preco": 4500.00, "fornecedor": "Dell"},
-    {"nome": "Mouse Gamer", "codigo": "MG456", "quantidade": 50, "peso": 0.3, "categoria": "Acessórios", "preco": 150.00, "fornecedor": "Razer"},
-    {"nome": "Teclado Mecânico", "codigo": "TM789", "quantidade": 30, "peso": 1.2, "categoria": "Acessórios", "preco": 350.00, "fornecedor": "HyperX"},
-    {"nome": "Monitor 24''", "codigo": "MN012", "quantidade": 20, "peso": 4.5, "categoria": "Eletrônicos", "preco": 1200.00, "fornecedor": "Samsung"},
-    {"nome": "Impressora HP", "codigo": "IP345", "quantidade": 5, "peso": 8.0, "categoria": "Periféricos", "preco": 800.00, "fornecedor": "HP"},
-    {"nome": "SSD 1TB", "codigo": "SD678", "quantidade": 40, "peso": 0.2, "categoria": "Armazenamento", "preco": 600.00, "fornecedor": "Kingston"},
-    {"nome": "Cadeira Gamer", "codigo": "CG901", "quantidade": 15, "peso": 15.0, "categoria": "Móveis", "preco": 1500.00, "fornecedor": "DXRacer"},
-    {"nome": "Placa de Vídeo RTX 3060", "codigo": "PV234", "quantidade": 8, "peso": 1.8, "categoria": "Hardware", "preco": 2800.00, "fornecedor": "NVIDIA"},
-    {"nome": "Processador Ryzen 5", "codigo": "PR567", "quantidade": 25, "peso": 0.5, "categoria": "Hardware", "preco": 1200.00, "fornecedor": "AMD"},
-    {"nome": "Memória RAM 16GB", "codigo": "MR890", "quantidade": 60, "peso": 0.1, "categoria": "Hardware", "preco": 400.00, "fornecedor": "Corsair"},
-    {"nome": "HD Externo 2TB", "codigo": "HD123", "quantidade": 35, "peso": 0.8, "categoria": "Armazenamento", "preco": 500.00, "fornecedor": "Seagate"},
-    {"nome": "Fonte 600W", "codigo": "FN456", "quantidade": 20, "peso": 2.0, "categoria": "Hardware", "preco": 350.00, "fornecedor": "EVGA"},
-    {"nome": "Gabinete Gamer", "codigo": "GB789", "quantidade": 18, "peso": 7.0, "categoria": "Hardware", "preco": 700.00, "fornecedor": "NZXT"},
-    {"nome": "Webcam Full HD", "codigo": "WC012", "quantidade": 22, "peso": 0.4, "categoria": "Periféricos", "preco": 250.00, "fornecedor": "Logitech"},
-    {"nome": "Microfone USB", "codigo": "MC345", "quantidade": 14, "peso": 0.6, "categoria": "Periféricos", "preco": 300.00, "fornecedor": "Blue Yeti"},
-    {"nome": "Headset Gamer", "codigo": "HS678", "quantidade": 27, "peso": 0.9, "categoria": "Acessórios", "preco": 450.00, "fornecedor": "SteelSeries"},
-    {"nome": "Controle Xbox", "codigo": "CX901", "quantidade": 12, "peso": 0.7, "categoria": "Acessórios", "preco": 500.00, "fornecedor": "Microsoft"},
-    {"nome": "Joystick para PC", "codigo": "JP234", "quantidade": 9, "peso": 1.1, "categoria": "Acessórios", "preco": 600.00, "fornecedor": "Thrustmaster"},
-    {"nome": "Placa-Mãe B450", "codigo": "PM567", "quantidade": 13, "peso": 1.5, "categoria": "Hardware", "preco": 850.00, "fornecedor": "ASUS"},
-    {"nome": "Cooler para CPU", "codigo": "CL890", "quantidade": 19, "peso": 0.8, "categoria": "Hardware", "preco": 200.00, "fornecedor": "Cooler Master"},
-    {"nome": "Smartphone Samsung", "codigo": "SP123", "quantidade": 30, "peso": 0.4, "categoria": "Eletrônicos", "preco": 2500.00, "fornecedor": "Samsung"},
-    {"nome": "Smartwatch Xiaomi", "codigo": "SW456", "quantidade": 40, "peso": 0.2, "categoria": "Eletrônicos", "preco": 700.00, "fornecedor": "Xiaomi"},
-    {"nome": "Tablet Apple", "codigo": "TB789", "quantidade": 10, "peso": 0.5, "categoria": "Eletrônicos", "preco": 5000.00, "fornecedor": "Apple"},
-    {"nome": "Carregador Universal", "codigo": "CU012", "quantidade": 50, "peso": 0.3, "categoria": "Acessórios", "preco": 120.00, "fornecedor": "Anker"},
-]
 
 
+    # Recupera informações da sessão
+    nome = session.get('nome', 'Usuário')  # Se não houver, usa 'Usuário' como default
+    cargo = session.get('cargo', 'Cargo')  # Se não houver, usa 'Cargo' como default
 
-    nome = session.get('nome', 'Usuário')
-    cargo = session.get('cargo', 'Cargo')
+
+    if request.method == 'POST':
+        # Verifica se estamos realizando uma busca ou adicionando um produto
+        if 'Busca' in request.form:
+            # Captura o critério de busca
+            criterio = request.form.get('Busca')  # Agora o nome correto é 'Busca'
+            valor_busca = request.form.get('valor_busca')  # Certifique-se de ter um campo adicional para inserir o valor da busca, como um input de texto ou algo similar
+
+            # Realiza a consulta no banco de dados com base no critério selecionado
+            if criterio == 'cod':
+                produtos = Produto.query.filter_by(codigo=valor_busca).all()
+            elif criterio == 'nome':
+                produtos = Produto.query.filter(Produto.nome.ilike(f'%{valor_busca}%')).all()
+            elif criterio == 'categoria':
+                produtos = Produto.query.filter_by(categoria=valor_busca).all()
+            elif criterio == 'fornecedor':
+                produtos = Produto.query.filter_by(fornecedor=valor_busca).all()
+            else:
+                produtos = []  # Caso nenhum critério válido seja selecionado
+
+            if produtos:
+                flash("Encontrado", "success") 
+            else:
+                flash("Não encontrado", "error")
+
+
+            
+            
+        
+        if 'nome' in request.form:  # Caso o formulário seja para adicionar um produto
+            nome = request.form.get("nome")
+            codigo = request.form.get("codigo")
+            quantidade = request.form.get("quantidade")
+            peso = request.form.get("peso")
+            categoria = request.form.get("categoria")
+            preco = request.form.get("preco")
+            fornecedor = request.form.get("fornecedor")
+
+            # Verifica se o produto já existe baseado no código
+            produto_existente = Produto.query.filter_by(codigo=codigo).first()
+
+            if produto_existente:
+                flash("Produto com esse código já existe", "error")  # Mensagem flash de erro
+            else:
+                # Cria um novo produto
+                novo_produto = Produto(
+                nome=nome,
+                codigo=codigo,
+                quantidade=int(quantidade),  # Converte para inteiro
+                peso=float(peso),  # Converte para float
+                categoria=categoria,
+                preco=float(preco),  # Converte para float
+                fornecedor=fornecedor
+                 )
+
+                # Adiciona o produto no banco de dados
+                db.session.add(novo_produto)
+                db.session.commit()
+            
+                flash("Produto adicionado com sucesso!", "success")  # Mensagem flash de sucesso
+            
+
+
+    # Consulta todos os produtos no banco de dados
+    produtos = Produto.query.all()  # Pode ser uma lista de objetos Produto
+
     return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos)
+
 
 
 @app.route("/logout")
