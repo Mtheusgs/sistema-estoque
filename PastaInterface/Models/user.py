@@ -22,19 +22,13 @@ class User(db.Model):
         """ Realiza o login do usuário e retorna o usuário se autenticado """
         return User.query.filter_by(Login=login, Senha=senha).first()
 
-    @classmethod
-    def alterarSenha(cls): 
-        login = input("Digite o login: ")
-        senha = input("Digite a senha: ")
-        """ Permite alterar a senha do usuário autenticado """
-        for user in cls.user_list:
-            if user.Login == login and user.Senha == senha:
-                nova_senha = input("Digite a nova senha: ")
-                user.Senha = nova_senha
-                print("Senha alterada com sucesso!")
-                return
+    @staticmethod
+    def listarUsers():
+        """ Lista todos os usuários cadastrados """ 
+        return User.query.all()
         
-        print("Usuário ou senha incorretos!")  # Se não encontrou o usuário
+
+    
 
 
 
@@ -56,8 +50,7 @@ class Gerente(User):
 
     
 
-class Funcionario(User): 
-    pass
+
 
 
 

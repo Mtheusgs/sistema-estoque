@@ -21,4 +21,18 @@ class Produto(db.Model):
         self.peso = peso
         self.categoria = categoria
         self.preco = preco
-        self.fornecedor = fornecedor
+        self.fornecedor = fornecedor 
+    
+    @staticmethod 
+    def buscarProduto(criterio, valor_busca):
+        """ Busca um produto no banco de dados """
+        if criterio == 'codigo':
+            return Produto.query.filter(Produto.codigo == valor_busca).all()
+        elif criterio == 'nome':
+            return Produto.query.filter(Produto.nome.ilike(f'%{valor_busca}%')).all()
+        elif criterio == 'categoria':
+            return Produto.query.filter_by(categoria=valor_busca).all()
+        elif criterio == 'fornecedor':
+            return Produto.query.filter_by(fornecedor=valor_busca).all()
+        else:
+            return []
