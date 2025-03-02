@@ -65,36 +65,36 @@ def register():
     
 
 @app.route("/dashboard", methods=["GET", "POST"])
-def dashboard():  
+def dashboard():
     # Recupera informações da sessão
-    nome = session.get('nome', 'Usuário')  # Se não houver, usa 'Usuário' como default
-    cargo = session.get('cargo', 'Cargo')  # Se não houver, usa 'Cargo' como default 
+    nome = session.get('nome', 'Usuário')  
+    cargo = session.get('cargo', 'Cargo')  
 
     # Consulta todos os produtos e usuários no banco de dados
-    produtos = Produto.query.all()  # Obtém todos os produtos
-    usuarios = User.listarUsers()  # Obtém todos os usuários
-    print("Usuários carregados:", usuarios)  # Depuração
+    produtos = Produto.query.all()  
+    usuarios = User.listarUsers()  
+    print("Usuários carregados:", usuarios)  
 
-    # Captura os critérios de busca
+    # Lógica de busca
     criterio = request.form.get('Busca')
     valor_busca = request.form.get('valor_busca')
-    
-    # Se não houver busca, apenas renderiza a página com todos os produtos e usuários
-    if not criterio and not valor_busca:
-        return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos)  
 
-    elif request.method == 'POST':
+    
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
         # Se for uma busca de produto
-        if 'Busca' in request.form:
+        if action == 'buscar' and criterio and valor_busca:
             Resultado = Produto.buscarProduto(criterio, valor_busca)
             if Resultado:
                 flash("Produto encontrado!", "success")
             else:    
                 flash("Produto não encontrado!", "error")
-            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado)    
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado)
 
         # Se for um cadastro de produto
-        elif 'nome' in request.form:
+        if action == 'adicionar' and request.form.get('nome'):  # Verifica se o campo 'nome' está presente
             nome = request.form.get("nome")
             codigo = request.form.get("codigo")
             quantidade = request.form.get("quantidade")
@@ -103,8 +103,10 @@ def dashboard():
             preco = request.form.get("preco")
             fornecedor = request.form.get("fornecedor")
 
-            # Verifica se o produto já existe
+            print(f"Nome: {nome}, Código: {codigo}, Quantidade: {quantidade}, Peso: {peso}, Categoria: {categoria}, Preço: {preco}, Fornecedor: {fornecedor}")
+
             produto_existente = Produto.query.filter_by(codigo=codigo).first()
+            
             if produto_existente:
                 flash("Produto com esse código já existe", "error")
             else:
@@ -119,14 +121,16 @@ def dashboard():
                 )
                 db.session.add(novo_produto)
                 db.session.commit()
-                flash("Produto adicionado com sucesso!", "success")  
+                flash("Produto adicionado com sucesso!", "success")
 
-        # Atualiza a lista de produtos e usuários
-        produtos = Produto.query.all()  
-        usuarios = User.listarUsers()
-        print("Usuários no template:", usuarios)  # Depuração
+    # Atualiza a lista de produtos e usuários
+    produtos = Produto.query.all()  
+    usuarios = User.listarUsers()
+    print("Usuários no template:", usuarios)  # Depuração
 
-        return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios)
+    return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos)
+
+
 
 
 
