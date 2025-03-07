@@ -35,4 +35,24 @@ class Produto(db.Model):
         elif criterio == 'fornecedor':
             return Produto.query.filter_by(fornecedor=valor_busca).all()
         else:
-            return []
+            return [] 
+        
+    @staticmethod
+    def apagarProduto(codigo):
+        """ Apaga um produto do banco de dados baseado no código """
+        print(f"Código buscado: {codigo}")
+        produto = Produto.query.filter(Produto.codigo == codigo).first()
+        print(f"Produto encontrado: {produto}")
+        
+        if produto:
+            db.session.delete(produto)  # Deleta o produto
+            db.session.commit()  # Confirma a alteração no banco de dados
+            return True  # Retorna True se a exclusão foi bem-sucedida
+        else:
+            return False  # Retorna False se o produto não foi encontrado
+        
+    
+
+        
+
+        
