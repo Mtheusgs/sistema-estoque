@@ -66,26 +66,32 @@ def register():
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    # Recupera informações da sessão
     nome = session.get('nome', 'Usuário')  
     cargo = session.get('cargo', 'Cargo')  
 
     # Consulta todos os produtos e usuários no banco de dados
     produtos = Produto.query.all()  
     usuarios = User.listarUsers()  
-    print("Usuários carregados:", usuarios)  
 
     # Lógica de busca
     criterio = request.form.get('Busca')
-    valor_busca = request.form.get('valor_busca')
+    valor_busca = request.form.get('valor_busca') 
+
 
     
 
     if request.method == 'POST':
-        action = request.form.get('action')
+        action = request.form.get('action') 
+
+        
+        codigo_apag = request.form.get("codigoApagar")
+    
+        print(f"Action: {action}")
+        print(f"Código para apagar: {codigo_apag}")
 
         # Se for uma busca de produto
-        if action == 'buscar' and criterio and valor_busca:
+        if action == 'buscar' and criterio and valor_busca: 
+            print("foi!")
             Resultado = Produto.buscarProduto(criterio, valor_busca)
             if Resultado:
                 flash("Produto encontrado!", "success")
@@ -103,8 +109,6 @@ def dashboard():
             preco = request.form.get("preco")
             fornecedor = request.form.get("fornecedor")
 
-            print(f"Nome: {nome}, Código: {codigo}, Quantidade: {quantidade}, Peso: {peso}, Categoria: {categoria}, Preço: {preco}, Fornecedor: {fornecedor}")
-
             produto_existente = Produto.query.filter_by(codigo=codigo).first()
             
             if produto_existente:
@@ -121,17 +125,25 @@ def dashboard():
                 )
                 db.session.add(novo_produto)
                 db.session.commit()
-                flash("Produto adicionado com sucesso!", "success")
+                flash("Produto adicionado com sucesso!", "success") 
 
-    # Atualiza a lista de produtos e usuários
+        # Se for uma exclusão de produto
+        if action == "apagar" and codigo_apag: 
+            print("Chegou")
+            codigo = request.form.get("codigoApagar")  
+            print(codigo)
+            sucesso = Produto.apagarProduto(codigo)  
+            if sucesso:
+                flash("Produto apagado com sucesso!", "success") 
+                
+            else:
+                flash("Produto não encontrado", "error")
+
+    # Recarrega a lista de produtos após a exclusão
     produtos = Produto.query.all()  
     usuarios = User.listarUsers()
-    print("Usuários no template:", usuarios)  # Depuração
 
     return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos)
-
-
-
 
 
 
