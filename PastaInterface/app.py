@@ -47,7 +47,7 @@ def register():
     senha = request.form.get("senha")
     
     # Verifica se o usuário já existe
-    if User.query.filter_by(Login=usuario).first():
+    if User.query.filter_by(Login=usuario).first():  # modificar 
         Usercast = False
     
     if not Usercast:  # Você pode simplificar assim
