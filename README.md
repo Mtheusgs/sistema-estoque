@@ -20,6 +20,7 @@ Este projeto consiste em um sistema de controle de estoque desenvolvido para fin
 - **Listagem de Produtos** 📋: Exibe todos os produtos registrados no estoque com a opção de visualização detalhada.
 - **Pedidos**: Permite realizar pedidos conforme disponibilidade de produtos.
 - **Gerenciar Fornecedores**: Possibilita realizar cadastro de fornecedores, bem como, gerir os fornecedores já existentes.
+- **Gerenciar Perfis**: Permite ao gerente administrar os perfis de usuário no sistema.
 - **Obter Relatório**: Permite gerar relatórios com informes relevantes como entrada e saída de produtos, estoque, pedidos realizados e entre outros setores. 
 
 ## Como Rodar o Projeto 🚀
