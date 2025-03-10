@@ -25,7 +25,13 @@ class User(db.Model):
     @staticmethod
     def listarUsers():
         """ Lista todos os usuários cadastrados """ 
-        return User.query.all()
+        return User.query.all() 
+    
+    @staticmethod
+    def mostrarUser(userNome): 
+        """ Mostra um usuário específico """
+        return User.query.filter_by(UserName=userNome).first()
+        
         
 
     

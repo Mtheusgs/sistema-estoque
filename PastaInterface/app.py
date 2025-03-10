@@ -67,7 +67,9 @@ def register():
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     nome = session.get('nome', 'Usuário')  
-    cargo = session.get('cargo', 'Cargo')  
+    cargo = session.get('cargo', 'Cargo')   
+
+    UserLogado = User.mostrarUser(nome)  # Mostra o usuário logado
 
     # Consulta todos os produtos e usuários no banco de dados
     produtos = Produto.query.all()  
@@ -143,7 +145,8 @@ def dashboard():
     produtos = Produto.query.all()  
     usuarios = User.listarUsers()
 
-    return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos)
+    UserLogado = User.mostrarUser(nome)  # Mostra o usuário logado
+    return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado)
 
 
 

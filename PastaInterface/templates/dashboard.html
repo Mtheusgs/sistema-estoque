@@ -58,7 +58,7 @@
                             <a href="javascript:void(0)" onclick="toggleContent('pedidos')" class="text-blue-500 hover:text-blue-700">Pedidos</a>
                         </li>
                         <li class="mb-2">
-                            <a href="javascript:void(0)" onclick="toggleContent('fornecedores')" class="text-blue-500 hover:text-blue-700">Fornecedores</a>
+                            <a href="javascript:void(0)" onclick="toggleContent('Perfil')" class="text-blue-500 hover:text-blue-700">Perfil</a>
                         </li> 
                         <li class="mb-2">
                             <a href="javascript:void(0)" onclick="toggleContent('user')" class="text-blue-500 hover:text-blue-700">Usuários</a>
@@ -66,9 +66,6 @@
                         <li class="mb-2">
                             <a href="javascript:void(0)" class="text-blue-500 hover:text-blue-700">Relatório</a>
                         </li>    
-                        <li class="mb-2">
-                            <a href="javascript:void(0)" class="text-blue-500 hover:text-blue-700">Perfil</a>
-                        </li>
                     </ul>
                 </div> 
             </div> 
@@ -258,16 +255,74 @@
                 
 
                 <!-- Seção Pedidos -->
-                <div id="pedidos" class="content w-full h-full hidden flex flex-col gap-6">
+                <div id="pedidos" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6 bg-white shadow-lg rounded-lg">
                     <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Pedidos</h1>
-                    <!-- Adicione aqui o conteúdo para pedidos -->
+
+                    <!-- Campo para inserir código do pedido -->
+                    <div class="w-full max-w-md flex flex-col gap-4">
+                        <label for="codigoPedido" class="text-gray-600 font-semibold text-sm">Código do Pedido</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="codigoPedido" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o código">
+                            <button onclick="adicionarPedido()" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">Adicionar</button>
+                        </div>
+                    </div>
+
+                    <!-- Carrinho de pedidos -->
+                    <div class="w-full max-w-md bg-gray-100 p-4 rounded-lg shadow-lg flex flex-col gap-3">
+                        <h2 class="text-lg font-semibold text-gray-700">Carrinho de Pedidos</h2>
+                        <ul id="listaPedidos" class="space-y-2">
+                            <!-- Pedidos adicionados aparecem aqui -->
+                        </ul>
+                    </div>
                 </div>
 
+
                 <!-- Seção Fornecedores -->
-                <div id="fornecedores" class="content w-full h-full hidden flex flex-col gap-6">
-                    <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Fornecedores</h1>
-                    <!-- Adicione aqui o conteúdo para fornecedores -->
+                <div id="Perfil" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6 bg-white">
+                    <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Seu perfil</h1>
+
+                    <div class="w-full h-full bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col gap-4">
+                        <div class="flex flex-col">
+                            <label class="text-blue-500 font-semibold text-lg">Nome Completo</label>
+                            <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-nome">{{UserLogado.UserName}}</div>
+                        </div>
+
+                        <div class="w-full flex flex-row gap-6">
+                            <div class="flex flex-col w-1/2">
+                                <label class="text-blue-500 font-semibold text-lg">Usuário</label>
+                                <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-usuario">{{UserLogado.Login}}</div>
+                            </div>
+
+                            <div class="flex flex-col w-1/2">
+                                <label class="text-blue-500 font-semibold text-lg">Cargo</label>
+                                <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-cargo">{{UserLogado.Cargo}}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col">
+                            <label class="text-blue-500 font-semibold text-lg">ID</label>
+                            <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-id">{{UserLogado.UserId}}</div>
+                        </div>
+
+                        <div class="w-full flex flex-row items-center justify-center gap-20">
+                            <div class="flex flex-col items-center justify-center mt-10">
+                                <img class="h-56 w-56 rounded-full shadow-lg" src="{{ url_for('static', filename='img/4.png') }}" alt="Imagem de perfil">
+                                <p class="text-gray-700 font-semibold mt-2">Proatividade</p>
+                            </div>
+                            <div class="flex flex-col items-center justify-center mt-10">
+                                <img class="h-56 w-56 rounded-full shadow-lg" src="{{ url_for('static', filename='img/5.png') }}" alt="Imagem de perfil">
+                                <p class="text-gray-700 font-semibold mt-2">Comunicação</p>
+                            </div>
+                            <div class="flex flex-col items-center justify-center mt-10">
+                                <img class="h-56 w-56 rounded-full shadow-lg" src="{{ url_for('static', filename='img/6.png') }}" alt="Imagem de perfil">
+                                <p class="text-gray-700 font-semibold mt-2">Escolhas</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+
+                
 
 
                 <!-- Seção Usuários -->
