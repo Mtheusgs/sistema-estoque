@@ -45,7 +45,11 @@ cd sistema-estoque
 pip install SQLAlchemy
 pip install flask
 ```
-
+- Em caso de erro de ModuleNotFoundError realize esse comando:
+  
+```bash
+pip install flask-sqlalchemy
+```
 - Com as dependências instaladas agora execute:
 
 ```bash
@@ -56,17 +60,24 @@ python app.py
 ```
 sistema-estoque/ 📂
 │
-├── app.py                 # Arquivo principal da aplicação Flask
-├── requirements.txt       # Dependências do projeto
-├── static/                # Arquivos estáticos (CSS, JS, imagens)
-│   └── styles.css         # Estilos personalizados
-├── templates/             # Arquivos HTML da aplicação
-│   ├── index.html         # Página principal (listagem de produtos)
-│   ├── add_product.html   # Página de cadastro de produtos
-│   └── edit_product.html  # Página de edição de produtos
-└── models/                # Lógica de classes e manipulação de dados
-    └── product.py         # Classe que representa um produto
+├── PastaInterface
+│    ├── Models/
+│    ├── __pycache__                                                                     
+│    ├── instance                                 
+│    ├── static/img                  
+│    ├── templates/                      
+│    ├── app.py             
+│    └── database.db
+├── Classes/User
+│    ├── error_handling.py  
+│    ├── error_handling_user.py  
+│    ├── estoque.py  
+│    ├── pedidos.py  
+│    ├── produto.py  
+│    ├── rasccunho.py  
+│    ├── relatorio.py  
+│    └── user.py  
+└── README.md        
 ```
-
 ---
 Esse projeto foi desenvolvido para aplicar na prática os conceitos de Programação Orientada a Objetos (POO), Desenvolvimento Web e entre outros conhecimentos relacionados.
