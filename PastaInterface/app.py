@@ -99,7 +99,7 @@ def dashboard():
                 flash("Produto encontrado!", "success")
             else:    
                 flash("Produto não encontrado!", "error")
-            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado)
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado,UserLogado=UserLogado)
 
         # Se for um cadastro de produto
         if action == 'adicionar' and request.form.get('nome'):  # Verifica se o campo 'nome' está presente
