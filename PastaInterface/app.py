@@ -98,7 +98,8 @@ def dashboard():
             if Resultado:
                 flash("Produto encontrado!", "success")
             else:    
-                flash("Produto não encontrado!", "error")
+                flash("Produto não encontrado! Retornando a lista principal", "error") 
+       
             return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado,UserLogado=UserLogado)
 
         # Se for um cadastro de produto
@@ -133,8 +134,11 @@ def dashboard():
         if action == "apagar" and codigo_apag: 
             print("Chegou")
             codigo = request.form.get("codigoApagar")  
-            print(codigo)
-            sucesso = Produto.apagarProduto(codigo)  
+            print(codigo) 
+            quantidade = request.form.get("quantapagar")
+
+            sucesso = Produto.apagarProduto(codigo,quantidade)  
+
             if sucesso:
                 flash("Produto apagado com sucesso!", "success") 
                 

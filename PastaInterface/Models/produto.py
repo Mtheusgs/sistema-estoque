@@ -38,18 +38,20 @@ class Produto(db.Model):
             return [] 
         
     @staticmethod
-    def apagarProduto(codigo):
+    def apagarProduto(codigo, quantidade):
         """ Apaga um produto do banco de dados baseado no código """
         print(f"Código buscado: {codigo}")
         produto = Produto.query.filter(Produto.codigo == codigo).first()
         print(f"Produto encontrado: {produto}")
         
-        if produto:
-            db.session.delete(produto)  # Deleta o produto
-            db.session.commit()  # Confirma a alteração no banco de dados
-            return True  # Retorna True se a exclusão foi bem-sucedida
+        if produto: 
+            produto.quantidade -= int(quantidade)
+            if produto.quantidade <= 0:
+                db.session.delete(produto) 
+            db.session.commit()
+            return True
         else:
-            return False  # Retorna False se o produto não foi encontrado
+            return False
         
     
 
