@@ -69,14 +69,18 @@ sistema-estoque/ 📂
 │    ├── app.py             
 │    └── database.db
 ├── classes-pré_feitas/User-poo
-│    ├── error_handling.py  
+│    c error_handling.py  
 │    ├── error_handling_user.py  
 │    ├── estoque.py  
 │    ├── pedidos.py  
 │    ├── produto.py  
 │    ├── rasccunho.py  
 │    ├── relatorio.py  
-│    └── user.py  
+│    └── user.py
+├── docs
+│    ├── Sprints 
+│    ├── Apresentação_Final_Sistema_de_Estoque.pdf 
+│    └── Descrição_Sistema_POO_GPTECOS.pdf
 └── README.md        
 ```
 ---
