@@ -191,9 +191,8 @@ def dashboard():
             active_section = request.form.get("section", "estoque") 
 
             print(active_section)
-            
 
-            codigo = request.form.get("codigoProCarrinho")  
+            codigo = request.form.get("codigoProCarrinho").upper()  
             quantidadeDesejada = request.form.get("quantidadeProcarrinho")  
 
             # Recupera o carrinho da sessão ou cria uma lista vazia
@@ -201,13 +200,20 @@ def dashboard():
 
             produto = Produto.addProduCarrinho(codigo,quantidadeDesejada)
             if produto:
-                # Converte o objeto Produto para um dicionário antes de adicionar ao carrinho
-                produto_dict = {
-                    "codigo": produto.codigo,
-                    "nome": produto.nome,
-                    "quantidade": quantidadeDesejada  # Usa a quantidade desejada do formulário
-                }
-                carrinhodeProdutos.append(produto_dict)
+                # Verifica se o produto já está no carrinho
+                produto_encontrado = next((p for p in carrinhodeProdutos if p["codigo"] == codigo), None)
+
+                if produto_encontrado:
+                    # Converte a quantidade existente para inteiro antes de somar
+                    produto_encontrado["quantidade"] = int(produto_encontrado["quantidade"]) + int(quantidadeDesejada)
+                else:
+                    # Se não existe, adiciona um novo item ao carrinho
+                    produto_dict = {
+                        "codigo": produto.codigo,
+                        "nome": produto.nome,
+                        "quantidade": quantidadeDesejada  # Mantendo como int
+                    }
+                    carrinhodeProdutos.append(produto_dict)
 
             # Salva o carrinho atualizado na sessão
             session["carrinho"] = carrinhodeProdutos 
