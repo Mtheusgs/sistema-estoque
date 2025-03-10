@@ -68,7 +68,7 @@ sistema-estoque/ 📂
 │    ├── templates/                      
 │    ├── app.py             
 │    └── database.db
-├── Classes/User
+├── classes-pré_feitas/User-poo
 │    ├── error_handling.py  
 │    ├── error_handling_user.py  
 │    ├── estoque.py  
