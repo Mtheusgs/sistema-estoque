@@ -31,8 +31,20 @@ class User(db.Model):
     def mostrarUser(userNome): 
         """ Mostra um usuário específico """
         return User.query.filter_by(UserName=userNome).first()
-        
-        
+    
+    @staticmethod  
+    def apagarUser(cargo,id):
+        """ Apaga um usuário do banco de dados """ 
+        if cargo == 'Gerente' or "Criador":
+            user = User.query.filter_by(UserId=id).first()
+            if user:
+                db.session.delete(user)
+                db.session.commit()
+                return True 
+            else:
+                return False
+        else:
+            return False    
 
     
 

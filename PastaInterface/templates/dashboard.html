@@ -13,6 +13,50 @@
             }
             document.getElementById(content).classList.remove("hidden");
         }
+        document.addEventListener("DOMContentLoaded", function () {
+        // Captura todos os formulários
+            const forms = document.querySelectorAll("form");
+    
+            forms.forEach(form => {
+                form.addEventListener("submit", function () {
+                // Define o valor do input oculto com a aba ativa
+                    document.getElementById("sectionInput").value = localStorage.getItem("activeSection");
+                });
+            });
+        
+            // Mantém a aba ativa ao recarregar a página
+            let activeSection = localStorage.getItem("activeSection") || "estoque";
+            toggleContent(activeSection);
+        });
+        function toggleContent(content) {
+            const contents = document.getElementsByClassName("content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.add("hidden");
+            }
+            document.getElementById(content).classList.remove("hidden");
+
+            // Salva a aba ativa no localStorage
+            localStorage.setItem("activeSection", content);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let activeSection = "{{ active_section }}";
+            toggleContent(activeSection);
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
 </head>   
 <body>
@@ -130,6 +174,7 @@
                             <!-- Formulário de busca -->
                             <form id="busca-form" method="POST" class="bg-white p-3 rounded shadow-lg flex flex-col gap-2 w-full mx-auto"> 
                                 <h1 class="text-3xl font-bold text-blue-400 mb-2">Buscar Produto</h1>
+                                
                             
                                 <label for="categoria" class="text-lg font-medium text-gray-700">Selecione um critério de busca:</label>
                                 <select id="categoria" name="Busca" class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3 required"> 
@@ -198,7 +243,8 @@
                             <div class="w-full h-full flex flex-col gap-6">
                                 <!-- Formulário para apagar produto -->
                                 <form id="Apagar-form" method="POST"  class="bg-white p-3 rounded shadow-lg flex flex-col gap-2 w-full mx-auto">
-                                    <h1 class="text-3xl font-bold text-blue-400 mb-2">Apagar produto</h1> 
+                                    <h1 class="text-3xl font-bold text-blue-400 mb-2">Apagar produto</h1>  
+
 
                                     <!-- Exibe mensagens flash -->
                                     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -270,8 +316,6 @@
                                 <label for="nome" class="text-lg font-medium text-gray-700">Nome</label>
                                 <input type="text" name="nome" class="border p-2 rounded w-full" placeholder="Nome" required>  
                 
-                                <label for="codigo" class="text-lg font-medium text-gray-700">Código</label>
-                                <input type="text" name="codigo" class="border p-2 rounded w-full" placeholder="Código" required>
                 
                                 <label for="quantidade" class="text-lg font-medium text-gray-700">Quantidade</label>
                                 <input type="Number" name="quantidade" class="border p-2 rounded w-full" placeholder="Quantidade" required>
@@ -316,9 +360,11 @@
                                 <label for="quantidadeProcarrinho" class="text-blue-500 font-bold text-3xl">Quantidade que deseja:</label>
                                 <input type="text" id="quantidadeProcarrinho" name="quantidadeProcarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite a quantidade">
 
-                                <input type="hidden" name="action" value="carrinho">
+                                <input type="hidden" name="action" value="carrinho"> 
 
-                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">Adicionar</button>
+                                <input type="hidden" name="section" id="sectionInput">
+
+                                <button type="submit"  class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">Adicionar</button>
 
                             </form>
 
@@ -414,8 +460,8 @@
                 <div id="user" class="content w-full h-full hidden flex flex-col gap-6">
                     <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Usuários</h1>
                     <!-- Adicione aqui o conteúdo para usuários --> 
-                    <div class="w-full h-full p-6 flex flex-col">
-                        <table class="auto border-collapse border border-gray-300">
+                    <div class="w-full h-full p-6 flex flex-col gap-6">
+                        <table class="auto border-collapse border border-gray-300 h-1/2 overflow-y-auto">
                             <thead>
                                 <tr class="bg-gray-200">
                                     <th class="border border-gray-300 px-4 py-2">ID</th>
@@ -423,7 +469,7 @@
                                     <th class="border border-gray-300 px-4 py-2">Cargo</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="h-1/5 overflow-y-auto">
                                 {% for usuario in usuarios %}
                                 <tr class="hover:bg-gray-100">
                                     <td class="border border-gray-300 px-4 py-2">{{ usuario.UserId }}</td>  
@@ -437,13 +483,43 @@
                                     </td>
                                 </tr>
                                 {% endfor %}
-    
                             </tbody>
-                        </table>
-                    </div>
-                
+                        </table> 
+                        <form method="POST" class="w-full flex flex-col gap-4 h-1/2"> 
 
+                            <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Apagar Usuário</h1> 
+
+
+                            <label for="apagarUser" class="text-blue-500 font-bold text-xl">ID do Usuário</label>
+                            <!-- Exibe mensagens flash -->
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <div class="flash-messages">
+                                    {% for category, message in messages %}
+                                        {% if category == 'apagado' or category == 'napagado' %}
+                                            <div class="alert alert-{{ category }} 
+                                                {% if category == 'apagado' %}
+                                                    text-blue-500
+                                                {% elif category == 'napagado' %}
+                                                    text-red-500
+                                                {% endif %}">
+                                                {{ message }}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% endwith %}
+                            <input type="number" id="apagarUser" name="userId" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o ID do usuário" required>
+                            <input type="hidden" name="action" value="apagarUser">
+                            <input type="hidden" name="section" id="sectionInput">
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">
+                                Enviar
+                            </button>
+                        </form>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

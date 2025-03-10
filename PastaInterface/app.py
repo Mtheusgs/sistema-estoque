@@ -3,7 +3,8 @@ import os
 from Models import db
 from Models.user import User  # Importamos depois do db para evitar erros 
 from Models.produto import Produto  # Importamos depois do db para evitar erros
-from Models.produto import Produto, validar_produto, ProdutoError  # Importamos depois do db para evitar erros
+from Models.produto import Produto, validar_produto, ProdutoError  # Importamos depois do db para evitar erros 
+from flask import redirect, url_for
 
 
 
@@ -67,6 +68,11 @@ def register():
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
+    
+
+    active_section = request.args.get("section", "gerEstoque")
+
+
     nome = session.get('nome', 'Usuário')  
     cargo = session.get('cargo', 'Cargo')   
 
@@ -93,31 +99,44 @@ def dashboard():
         codigo_apag = request.form.get("codigoApagar") 
 
         
-    
-
 
         # Se for uma busca de produto
-        if action == 'buscar' and criterio and valor_busca: 
-            print("foi!")
+        if action == 'buscar':
+            if not criterio: 
+                flash("Por favor, selecione um critério de busca!", "error")
+                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section="gerEstoque")
+
+            if not valor_busca: 
+                flash("Por favor, digite um valor para buscar!", "error")
+                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section="gerEstoque")
+
+            
             Resultado = Produto.buscarProduto(criterio, valor_busca)
+            
             if Resultado:
                 flash("Produto encontrado!", "success")
+                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado, UserLogado=UserLogado,active_section="gerEstoque")
             else:    
-                flash("Produto não encontrado! Retornando a lista principal", "error")  
-                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos,UserLogado=UserLogado)
-                
-       
-            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado,UserLogado=UserLogado)
+                flash("Produto não encontrado! Retornando à lista principal", "error")  
+                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section="gerEstoque")
+            
+
 
         # Se for um cadastro de produto
         if action == 'adicionar' and request.form.get('nome'):  # Verifica se o campo 'nome' está presente
             nome_produto = request.form.get("nome")
-            codigo = request.form.get("codigo")
             quantidade = request.form.get("quantidade")
             peso = request.form.get("peso")
             categoria = request.form.get("categoria")
             preco = request.form.get("preco")
             fornecedor = request.form.get("fornecedor") 
+
+
+            if nome_produto and fornecedor and preco:
+                codigo = f"{nome_produto[0].upper()}{fornecedor[0].upper()}{int(float(preco))}"
+            else:
+                flash("Erro ao gerar código do produto. Verifique os campos!", "error-add")
+
 
 
             produto_existente = Produto.query.filter_by(codigo=codigo).first()
@@ -164,19 +183,30 @@ def dashboard():
                     
         
         # Se for uma ação de carrinho
-        if action == "carrinho": 
+        if action == "carrinho":  
+
+            active_section = request.form.get("section", "estoque")
 
             codigo = request.form.get("codigoProCarrinho")  
-
             quantidadeDesejada = request.form.get("quantidadeProcarrinho") 
-
             carrinhodeProdutos = [] 
-            
-
             carrinhodeProdutos.append(Produto.addProduCarrinho(codigo))  
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado, carrinhodeProdutos=carrinhodeProdutos,quantidadeDesejada=quantidadeDesejada,active_section=active_section)
 
-            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado, carrinhodeProdutos=carrinhodeProdutos,quantidadeDesejada=quantidadeDesejada)
+
+        if action == "apagarUser":
+            active_section = request.args.get("section", "user")
+            idApagar = request.form.get("userId")  
+            ocorreu=User.apagarUser(cargo, idApagar)  
+            if ocorreu:
+                flash("Usuário apagado com sucesso!", "apagado") 
+                listaUser=User.listarUsers()
+                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=listaUser, Resultado=produtos, UserLogado=UserLogado,active_section=active_section)
+            else:
+                flash("Você não tem permissão para apagar usuários ou o usuário não foi encontrado", "napagado")
+                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section=active_section)
             
+
 
 
     # Recarrega a lista de produtos após a exclusão
@@ -184,7 +214,7 @@ def dashboard():
     usuarios = User.listarUsers()
 
     UserLogado = User.mostrarUser(nome)  # Mostra o usuário logado
-    return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado)
+    return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado, active_section=active_section)
 
 
 

@@ -25,15 +25,15 @@ class Produto(db.Model):
     
     @staticmethod 
     def buscarProduto(criterio, valor_busca):
-        """ Busca um produto no banco de dados """
+        """ Busca um produto no banco de dados sem diferenciar maiúsculas e minúsculas """
         if criterio == 'codigo':
-            return Produto.query.filter(Produto.codigo == valor_busca).all()
+            return Produto.query.filter(Produto.codigo.ilike(valor_busca)).all()
         elif criterio == 'nome':
-            return Produto.query.filter(Produto.nome.ilike(f'%{valor_busca}%')).all()
+            return Produto.query.filter(Produto.nome.ilike(valor_busca)).all()
         elif criterio == 'categoria':
-            return Produto.query.filter_by(categoria=valor_busca).all()
+            return Produto.query.filter(Produto.categoria.ilike(valor_busca)).all()
         elif criterio == 'fornecedor':
-            return Produto.query.filter_by(fornecedor=valor_busca).all()
+            return Produto.query.filter(Produto.fornecedor.ilike(valor_busca)).all()
         else:
             return [] 
         
