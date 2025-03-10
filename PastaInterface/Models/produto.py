@@ -54,12 +54,17 @@ class Produto(db.Model):
         else:
             return False 
 
+
     @staticmethod
-    def addProduCarrinho(codigo):
+    def addProduCarrinho(codigo,quantidade):
         """ Adiciona um produto ao carrinho """
-        produtoCarrinho = Produto.query.filter(Produto.codigo == codigo).first() 
+        produtoCarrinho = Produto.query.filter(Produto.codigo == codigo).first()  
+        if int(quantidade) <= 0 or int(quantidade)>produtoCarrinho.quantidade:
+            return False 
+        else:
+            return produtoCarrinho
         
-        return produtoCarrinho
+        
 
 
 class ProdutoError(Exception):
@@ -91,8 +96,6 @@ def validar_produto(quantidade, peso, preco):
         raise PrecoInvalidoError(preco)
         
         
-    
 
-        
 
         

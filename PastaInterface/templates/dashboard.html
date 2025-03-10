@@ -348,30 +348,49 @@
                 <div id="pedidos" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6">
                     <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Pedidos</h1>
 
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    <div class="flash-messages">
+                                        {% for category, message in messages %}
+                                            {% if category == 'errocar' or category == 'successcar' %}
+                                                <div class="alert alert-{{ category }} 
+                                                    {% if category == 'successcar' %}
+                                                        text-blue-500
+                                                    {% elif category == 'errocar' %}
+                                                        text-red-500
+                                                    {% endif %}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
+
                     <!-- Campo para inserir código do pedido -->
                     <div class="flex flex-row gap-10 w-full">
                         <div class="w-1/2 flex flex-col gap-4 bg-white shadow-lg p-4 rounded-lg h-[600px] gap-6">
                             
                             <form id="FormPedido" method="POST" class="flex flex-col gap-6">
 
-                                <label for="codigoProCarrinho" class="text-blue-500 font-bold text-3xl">Código do Pedido</label>
+                                <label for="codigoProCarrinho" class="text-blue-500 font-bold text-3xl">Código do Produto</label>
                                 <input type="text" id="codigoProCarrinho" name="codigoProCarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o código">
 
                                 <label for="quantidadeProcarrinho" class="text-blue-500 font-bold text-3xl">Quantidade que deseja:</label>
-                                <input type="text" id="quantidadeProcarrinho" name="quantidadeProcarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite a quantidade">
+                                <input type="number" id="quantidadeProcarrinho" name="quantidadeProcarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite a quantidade">
 
                                 <input type="hidden" name="action" value="carrinho"> 
 
                                 <input type="hidden" name="section" id="sectionInput">
 
-                                <button type="submit"  class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">Adicionar</button>
+                                <button type="submit"  class="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">Adicionar</button>
 
                             </form>
 
                             <div class="w-full h-[150px] flex-grow overflow-auto">
                                 <table class="w-full border-collapse border border-gray-300">
                                     <tbody>
-                                        {% for resultado in Resultado %}
+                                        {% for resultado in produtos %}
                                         <tr class="hover:bg-gray-100">
                                             <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
                                             <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
@@ -389,21 +408,41 @@
                         </div>
     
                         <!-- Carrinho de pedidos -->
-                        <div class="w-1/2 bg-write p-4 rounded-lg shadow-lg flex flex-col gap-3">
+                        <div class="w-1/2 bg-white p-4 rounded-lg shadow-lg flex flex-col gap-3">
                             <h2 class="text-blue-500 text-3xl font-bold">Carrinho de Pedidos</h2>
-                            <table class="w-full border-collapse border border-gray-300">
-                                <tbody>
-                                    {% for resultado in carrinhodeProdutos %} 
-                                    <tr class="hover:bg-gray-100">
-                                        <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
-                                        <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
-                                        <td class="border border-gray-300 px-2 py-2">{{ quantidadeDesejada }}</td>
+                            <!-- Contêiner da tabela com scroll ativado -->
+                            <div class="overflow-y-auto" style="max-height: 300px;"> <!-- Ajuste a altura conforme necessário -->
+                                <table class="w-full border-collapse border border-gray-300">
+                                    <tbody>
+                                        {% for resultado in carrinhodeProdutos %}
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.quantidade }}</td> <!-- Corrigi para exibir a quantidade -->
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
 
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                            <div class="w-full flex flex-col gap-5">
+                                <!-- Formulário com input number e botão retirar -->
+                                <form method="POST" class="flex flex-col gap-4">
+                                    <!-- Campo de número -->
+                                    <div class="flex flex-col gap-4">
+                                        <label for="alterarPedido" class="text-2xl font-bold text-blue-500">Linha que Deseja retirar</label>
+                                        <input type="number" name="alterarPedido" class="mt-1 block w-24 w-full py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" min="0" placeholder="Eliminar produto"> 
+                                        <input type="hidden" name="action" value="alterar">
+                                    </div>
+
+                                    <!-- Botão retirar -->
+                                    <div>
+                                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-700">Retirar</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -513,7 +552,7 @@
                             <input type="number" id="apagarUser" name="userId" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o ID do usuário" required>
                             <input type="hidden" name="action" value="apagarUser">
                             <input type="hidden" name="section" id="sectionInput">
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">
+                            <button type="submit" class="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
                                 Enviar
                             </button>
                         </form>

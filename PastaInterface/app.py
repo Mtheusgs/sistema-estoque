@@ -4,7 +4,9 @@ from Models import db
 from Models.user import User  # Importamos depois do db para evitar erros 
 from Models.produto import Produto  # Importamos depois do db para evitar erros
 from Models.produto import Produto, validar_produto, ProdutoError  # Importamos depois do db para evitar erros 
-from flask import redirect, url_for
+from flask import redirect, url_for  
+
+
 
 
 
@@ -86,10 +88,8 @@ def dashboard():
     criterio = request.form.get('Busca')
     valor_busca = request.form.get('valor_busca')  
 
-    carrinho = request.form.get('carrinho')
-
-
     
+
 
     if request.method == 'POST':
         action = request.form.get('action')  
@@ -119,6 +119,8 @@ def dashboard():
             else:    
                 flash("Produto não encontrado! Retornando à lista principal", "error")  
                 return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section="gerEstoque")
+            
+            
             
 
 
@@ -161,7 +163,7 @@ def dashboard():
                     flash("Produto adicionado com sucesso!", "success-add") 
                 except ProdutoError as err:
                     flash(str(err), "error-add")
- 
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section="gerEstoque")
 
         # Se for uma exclusão de produto
         if action == "apagar" and codigo_apag: 
@@ -180,18 +182,60 @@ def dashboard():
                     flash("Produto não encontrado", "error-del")
             except ProdutoError as err:
                     flash(str(err), "error-del")
+
+
+
                     
-        
         # Se for uma ação de carrinho
         if action == "carrinho":  
+            active_section = request.form.get("section", "estoque") 
 
-            active_section = request.form.get("section", "estoque")
+            print(active_section)
+            
 
             codigo = request.form.get("codigoProCarrinho")  
-            quantidadeDesejada = request.form.get("quantidadeProcarrinho") 
-            carrinhodeProdutos = [] 
-            carrinhodeProdutos.append(Produto.addProduCarrinho(codigo))  
-            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado, carrinhodeProdutos=carrinhodeProdutos,quantidadeDesejada=quantidadeDesejada,active_section=active_section)
+            quantidadeDesejada = request.form.get("quantidadeProcarrinho")  
+
+            # Recupera o carrinho da sessão ou cria uma lista vazia
+            carrinhodeProdutos = session.get("carrinho", [])  
+
+            produto = Produto.addProduCarrinho(codigo,quantidadeDesejada)
+            if produto:
+                # Converte o objeto Produto para um dicionário antes de adicionar ao carrinho
+                produto_dict = {
+                    "codigo": produto.codigo,
+                    "nome": produto.nome,
+                    "quantidade": quantidadeDesejada  # Usa a quantidade desejada do formulário
+                }
+                carrinhodeProdutos.append(produto_dict)
+
+            # Salva o carrinho atualizado na sessão
+            session["carrinho"] = carrinhodeProdutos 
+            session.modified = True  # Garante que a sessão seja atualizada
+
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos,carrinhodeProdutos=carrinhodeProdutos,quantidadeDesejada=quantidadeDesejada,UserLogado=UserLogado, active_section=active_section)
+
+        if action == "alterar": 
+            active_section = request.form.get("section", "estoque") 
+
+            # Recupera o carrinho da sessão
+            carrinhodeProdutos = session.get("carrinho", [])
+
+            # A linha que você quer remover do carrinho
+            linha = request.form.get("alterarPedido") 
+            print(linha)
+
+            # Verifica se a linha existe na lista
+            if 0 <= int(linha) < len(carrinhodeProdutos):
+                del carrinhodeProdutos[int(linha)]
+
+            # Salva o carrinho atualizado na sessão
+            session["carrinho"] = carrinhodeProdutos
+            session.modified = True
+
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, carrinhodeProdutos=carrinhodeProdutos, UserLogado=UserLogado, active_section="pedidos")
+
+
 
 
         if action == "apagarUser":
@@ -214,7 +258,7 @@ def dashboard():
     usuarios = User.listarUsers()
 
     UserLogado = User.mostrarUser(nome)  # Mostra o usuário logado
-    return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado, active_section=active_section)
+    return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos,carrinhodeProdutos=[], UserLogado=UserLogado, active_section=active_section)
 
 
 
