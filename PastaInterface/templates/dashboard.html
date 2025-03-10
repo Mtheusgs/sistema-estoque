@@ -431,14 +431,20 @@
                                     <!-- Campo de número -->
                                     <div class="flex flex-col gap-4">
                                         <label for="alterarPedido" class="text-2xl font-bold text-blue-500">Linha que Deseja retirar</label>
-                                        <input type="number" name="alterarPedido" class="mt-1 block w-24 w-full py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" min="0" placeholder="Eliminar produto"> 
+                                        <input type="number" name="alterarPedido" class="mt-1 block w-24 w-full py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 p-2" min="0" placeholder="Eliminar produto"> 
                                         <input type="hidden" name="action" value="alterar">
                                     </div>
 
                                     <!-- Botão retirar -->
                                     <div>
-                                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-700">Retirar</button>
+                                        <button type="submit" class="w-full py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-700">Retirar</button>
                                     </div>
+                                </form> 
+                                <form method="POST">
+                                    <!-- Campo oculto para passar a ação -->
+                                    <input type="hidden" name="action" value="Confirmar">                                
+                                    <!-- Botão de enviar -->
+                                    <button class="w-full h-10 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition"  type="submit">Confirmar Pedido</button>
                                 </form>
                             </div>
                         </div>

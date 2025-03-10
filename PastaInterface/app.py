@@ -211,9 +211,12 @@ def dashboard():
 
             # Salva o carrinho atualizado na sessão
             session["carrinho"] = carrinhodeProdutos 
-            session.modified = True  # Garante que a sessão seja atualizada
+            session.modified = True  # Garante que a sessão seja atualizada  
+
 
             return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos,carrinhodeProdutos=carrinhodeProdutos,quantidadeDesejada=quantidadeDesejada,UserLogado=UserLogado, active_section=active_section)
+
+                 
 
         if action == "alterar": 
             active_section = request.form.get("section", "estoque") 
@@ -250,7 +253,30 @@ def dashboard():
                 flash("Você não tem permissão para apagar usuários ou o usuário não foi encontrado", "napagado")
                 return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section=active_section)
             
+        if action == "Confirmar":
+            carrinhodeProdutos = session.get("carrinho", [])
+            
+            # Itera sobre o carrinho
+            for item in carrinhodeProdutos:
+                codigo = item.get('codigo')  # Código do produto
+                quantidade = item.get('quantidade')  # Quantidade do produto
+                
+                # Verifica se o produto existe e chama o método para apagar do banco
+                sucesso = Produto.apagarProduto(codigo, quantidade)
+                
+                # Se a remoção for bem-sucedida, você pode executar algo aqui (se necessário)
+                if sucesso:
+                    flash(f"Produto {codigo} removido com sucesso!", "success-del")
+                else:
+                    flash(f"Produto {codigo} não encontrado no banco de dados.", "error-del")
+            
+            # Atualiza o carrinho na sessão, removendo os produtos
+            session["carrinho"] = []
+            session.modified = True
 
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, carrinhodeProdutos=[], UserLogado=UserLogado, active_section="pedidos")
+
+                
 
 
     # Recarrega a lista de produtos após a exclusão
