@@ -37,6 +37,7 @@ class Produto(db.Model):
         else:
             return [] 
         
+        
     @staticmethod
     def apagarProduto(codigo, quantidade):
         """ Apaga um produto do banco de dados baseado no código """
@@ -51,7 +52,44 @@ class Produto(db.Model):
             db.session.commit()
             return True
         else:
-            return False
+            return False 
+
+    @staticmethod
+    def addProduCarrinho(codigo):
+        """ Adiciona um produto ao carrinho """
+        produtoCarrinho = Produto.query.filter(Produto.codigo == codigo).first() 
+        
+        return produtoCarrinho
+
+
+class ProdutoError(Exception):
+    """Classe base para exceções relacionadas a produtos."""
+    pass
+
+class QuantidadeInvalidaError(ProdutoError):
+    """Exceção para quando a quantidade for negativa."""
+    def __init__(self, quantidade):
+        super().__init__(f"A quantidade ({quantidade}) não pode ser negativa.")
+
+class PesoInvalidoError(ProdutoError):
+    """Exceção para quando o peso for negativo ou zero."""
+    def __init__(self, peso):
+        super().__init__(f"O peso ({peso}) deve ser maior que zero.")
+
+class PrecoInvalidoError(ProdutoError):
+    """Exceção para quando o preço for negativo ou zero."""
+    def __init__(self, preco):
+        super().__init__(f"O preço ({preco}) deve ser maior que zero.")
+
+def validar_produto(quantidade, peso, preco):
+    """Valida os valores do produto e levanta exceções se necessário."""
+    if int(quantidade) < 0:
+        raise QuantidadeInvalidaError(quantidade)
+    if float(peso) <= 0:
+        raise PesoInvalidoError(peso)
+    if float(preco) <= 0:
+        raise PrecoInvalidoError(preco)
+        
         
     
 

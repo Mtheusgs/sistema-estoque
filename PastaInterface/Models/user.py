@@ -38,21 +38,7 @@ class User(db.Model):
 
 
 
-class Gerente(User):
-    def __init__(self, UserId: str, UserName: str, Cargo: str, Senha: str, Login: str):
-        super().__init__(UserId, UserName, Cargo, Senha, Login)
-        self.cargo = "Gerente" 
-    
-    def removerUser(self):
-        """ Remove um usuário da lista """
-        user_id = input("Digite o ID do usuário que deseja remover: ")
-        for user in User.user_list:
-            if user.UserId == user_id:
-                User.user_list.remove(user)
-                print(f"Usuário {user.UserName} removido com sucesso!")
-                return
-        
-        print("Usuário não encontrado!")
+
 
     
 

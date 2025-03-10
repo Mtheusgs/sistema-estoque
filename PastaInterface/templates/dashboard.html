@@ -63,9 +63,7 @@
                         <li class="mb-2">
                             <a href="javascript:void(0)" onclick="toggleContent('user')" class="text-blue-500 hover:text-blue-700">Usuários</a>
                         </li>   
-                        <li class="mb-2">
-                            <a href="javascript:void(0)" class="text-blue-500 hover:text-blue-700">Relatório</a>
-                        </li>    
+
                     </ul>
                 </div> 
             </div> 
@@ -162,19 +160,21 @@
                                 {% if messages %}
                                     <div class="flash-messages">
                                         {% for category, message in messages %}
-                                            <div class="alert alert-{{ category }} 
-                                                {% if category == 'success' %}
-                                                    text-blue-500
-                                                {% elif category == 'error' %}
-                                                    text-red-500
-                                                {% endif %}">
-                                                {{ message }}
-                                            </div>
+                                            {% if category == 'success' or category == 'error' %}
+                                                <div class="alert alert-{{ category }} 
+                                                    {% if category == 'success' %}
+                                                        text-blue-500
+                                                    {% elif category == 'error' %}
+                                                        text-red-500
+                                                    {% endif %}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endif %}
                                         {% endfor %}
                                     </div>
                                 {% endif %}
                                 {% endwith %}
-                
+
                                 <div class="w-full h-[150px] flex-grow overflow-auto">
                                     <table class="w-full border-collapse border border-gray-300">
                                         <tbody>
@@ -198,7 +198,29 @@
                             <div class="w-full h-full flex flex-col gap-6">
                                 <!-- Formulário para apagar produto -->
                                 <form id="Apagar-form" method="POST"  class="bg-white p-3 rounded shadow-lg flex flex-col gap-2 w-full mx-auto">
-                                    <h1 class="text-3xl font-bold text-blue-400 mb-2">Apagar produto</h1>
+                                    <h1 class="text-3xl font-bold text-blue-400 mb-2">Apagar produto</h1> 
+
+                                    <!-- Exibe mensagens flash -->
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                        <div class="flash-messages">
+                                            {% for category, message in messages %}
+                                                {% if category == 'success-del' or category == 'error-del' %}
+                                                    <div class="alert alert-{{ category }} 
+                                                        {% if category == 'success-del' %}
+                                                            text-blue-500
+                                                        {% elif category == 'error-del' %}
+                                                            text-red-500
+                                                        {% endif %}">
+                                                        {{ message }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% endwith %}
+
+
                                     
                                     <label for="codigo" class="text-lg font-medium text-gray-700">Código do produto</label>
 
@@ -224,6 +246,26 @@
                             <!-- Formulário para adicionar produto -->
                             <form id="Adicionar-form" method="POST"  class="bg-white p-3 rounded shadow-lg flex flex-col gap-2 w-full mx-auto"> 
                                 <h1 class="text-3xl font-bold text-blue-400 mb-3">Adicionar produtos</h1>
+
+                                <!-- Exibe mensagens flash -->
+                                {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    <div class="flash-messages">
+                                        {% for category, message in messages %}
+                                            {% if category == 'success-add' or category == 'error-add' %}
+                                                <div class="alert alert-{{ category }} 
+                                                    {% if category == 'success-add' %}
+                                                        text-blue-500
+                                                    {% elif category == 'error-add' %}
+                                                        text-red-500
+                                                    {% endif %}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
                 
                                 <label for="nome" class="text-lg font-medium text-gray-700">Nome</label>
                                 <input type="text" name="nome" class="border p-2 rounded w-full" placeholder="Nome" required>  
@@ -259,29 +301,68 @@
                 
 
                 <!-- Seção Pedidos -->
-                <div id="pedidos" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6 bg-white shadow-lg rounded-lg">
+                <div id="pedidos" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6">
                     <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Pedidos</h1>
 
                     <!-- Campo para inserir código do pedido -->
-                    <div class="w-full max-w-md flex flex-col gap-4">
-                        <label for="codigoPedido" class="text-gray-600 font-semibold text-sm">Código do Pedido</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="codigoPedido" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o código">
-                            <button onclick="adicionarPedido()" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">Adicionar</button>
-                        </div>
-                    </div>
+                    <div class="flex flex-row gap-10 w-full">
+                        <div class="w-1/2 flex flex-col gap-4 bg-white shadow-lg p-4 rounded-lg h-[600px] gap-6">
+                            
+                            <form id="FormPedido" method="POST" class="flex flex-col gap-6">
 
-                    <!-- Carrinho de pedidos -->
-                    <div class="w-full max-w-md bg-gray-100 p-4 rounded-lg shadow-lg flex flex-col gap-3">
-                        <h2 class="text-lg font-semibold text-gray-700">Carrinho de Pedidos</h2>
-                        <ul id="listaPedidos" class="space-y-2">
-                            <!-- Pedidos adicionados aparecem aqui -->
-                        </ul>
+                                <label for="codigoProCarrinho" class="text-blue-500 font-bold text-3xl">Código do Pedido</label>
+                                <input type="text" id="codigoProCarrinho" name="codigoProCarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o código">
+
+                                <label for="quantidadeProcarrinho" class="text-blue-500 font-bold text-3xl">Quantidade que deseja:</label>
+                                <input type="text" id="quantidadeProcarrinho" name="quantidadeProcarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite a quantidade">
+
+                                <input type="hidden" name="action" value="carrinho">
+
+                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition">Adicionar</button>
+
+                            </form>
+
+                            <div class="w-full h-[150px] flex-grow overflow-auto">
+                                <table class="w-full border-collapse border border-gray-300">
+                                    <tbody>
+                                        {% for resultado in Resultado %}
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.quantidade }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.peso }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.categoria }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.preco }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.fornecedor }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+    
+                        </div>
+    
+                        <!-- Carrinho de pedidos -->
+                        <div class="w-1/2 bg-write p-4 rounded-lg shadow-lg flex flex-col gap-3">
+                            <h2 class="text-blue-500 text-3xl font-bold">Carrinho de Pedidos</h2>
+                            <table class="w-full border-collapse border border-gray-300">
+                                <tbody>
+                                    {% for resultado in carrinhodeProdutos %} 
+                                    <tr class="hover:bg-gray-100">
+                                        <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
+                                        <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
+                                        <td class="border border-gray-300 px-2 py-2">{{ quantidadeDesejada }}</td>
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
 
-                <!-- Seção Fornecedores -->
+                <!-- Seção Perfil -->
                 <div id="Perfil" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6 bg-white">
                     <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Seu perfil</h1>
 

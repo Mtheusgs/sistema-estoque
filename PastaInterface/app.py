@@ -3,6 +3,7 @@ import os
 from Models import db
 from Models.user import User  # Importamos depois do db para evitar erros 
 from Models.produto import Produto  # Importamos depois do db para evitar erros
+from Models.produto import Produto, validar_produto, ProdutoError  # Importamos depois do db para evitar erros
 
 
 
@@ -77,19 +78,23 @@ def dashboard():
 
     # Lógica de busca
     criterio = request.form.get('Busca')
-    valor_busca = request.form.get('valor_busca') 
+    valor_busca = request.form.get('valor_busca')  
+
+    carrinho = request.form.get('carrinho')
 
 
     
 
     if request.method == 'POST':
-        action = request.form.get('action') 
+        action = request.form.get('action')  
+
 
         
-        codigo_apag = request.form.get("codigoApagar")
+        codigo_apag = request.form.get("codigoApagar") 
+
+        
     
-        print(f"Action: {action}")
-        print(f"Código para apagar: {codigo_apag}")
+
 
         # Se for uma busca de produto
         if action == 'buscar' and criterio and valor_busca: 
@@ -98,37 +103,46 @@ def dashboard():
             if Resultado:
                 flash("Produto encontrado!", "success")
             else:    
-                flash("Produto não encontrado! Retornando a lista principal", "error") 
+                flash("Produto não encontrado! Retornando a lista principal", "error")  
+                return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos,UserLogado=UserLogado)
+                
        
             return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=Resultado,UserLogado=UserLogado)
 
         # Se for um cadastro de produto
         if action == 'adicionar' and request.form.get('nome'):  # Verifica se o campo 'nome' está presente
-            nome = request.form.get("nome")
+            nome_produto = request.form.get("nome")
             codigo = request.form.get("codigo")
             quantidade = request.form.get("quantidade")
             peso = request.form.get("peso")
             categoria = request.form.get("categoria")
             preco = request.form.get("preco")
-            fornecedor = request.form.get("fornecedor")
+            fornecedor = request.form.get("fornecedor") 
+
 
             produto_existente = Produto.query.filter_by(codigo=codigo).first()
             
             if produto_existente:
                 flash("Produto com esse código já existe", "error")
             else:
-                novo_produto = Produto(
-                    nome=nome,
-                    codigo=codigo,
-                    quantidade=int(quantidade),
-                    peso=float(peso),
-                    categoria=categoria,
-                    preco=float(preco),
-                    fornecedor=fornecedor
-                )
-                db.session.add(novo_produto)
-                db.session.commit()
-                flash("Produto adicionado com sucesso!", "success") 
+                try:
+                    validar_produto(quantidade, peso, preco)
+
+                    novo_produto = Produto(
+                        nome=nome_produto,
+                        codigo=codigo,
+                        quantidade=int(quantidade),
+                        peso=float(peso),
+                        categoria=categoria,
+                        preco=float(preco),
+                        fornecedor=fornecedor
+                    )
+                    db.session.add(novo_produto)
+                    db.session.commit()
+                    flash("Produto adicionado com sucesso!", "success-add") 
+                except ProdutoError as err:
+                    flash(str(err), "error-add")
+ 
 
         # Se for uma exclusão de produto
         if action == "apagar" and codigo_apag: 
@@ -136,14 +150,34 @@ def dashboard():
             codigo = request.form.get("codigoApagar")  
             print(codigo) 
             quantidade = request.form.get("quantapagar")
+            try:
+                validar_produto(quantidade, 1, 1)
+                sucesso = Produto.apagarProduto(codigo,quantidade)  
 
-            sucesso = Produto.apagarProduto(codigo,quantidade)  
+                if sucesso:
+                    flash("Produto apagado com sucesso!", "success-del") 
+                    
+                else:
+                    flash("Produto não encontrado", "error-del")
+            except ProdutoError as err:
+                    flash(str(err), "error-del")
+                    
+        
+        # Se for uma ação de carrinho
+        if action == "carrinho": 
 
-            if sucesso:
-                flash("Produto apagado com sucesso!", "success") 
-                
-            else:
-                flash("Produto não encontrado", "error")
+            codigo = request.form.get("codigoProCarrinho")  
+
+            quantidadeDesejada = request.form.get("quantidadeProcarrinho") 
+
+            carrinhodeProdutos = [] 
+            
+
+            carrinhodeProdutos.append(Produto.addProduCarrinho(codigo))  
+
+            return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado, carrinhodeProdutos=carrinhodeProdutos,quantidadeDesejada=quantidadeDesejada)
+            
+
 
     # Recarrega a lista de produtos após a exclusão
     produtos = Produto.query.all()  
