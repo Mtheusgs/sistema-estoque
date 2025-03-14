@@ -160,9 +160,11 @@ def dashboard():
                     )
                     db.session.add(novo_produto)
                     db.session.commit()
-                    flash("Produto adicionado com sucesso!", "success-add") 
+                    flash("Produto adicionado com sucesso!", "success-add")  
+
                 except ProdutoError as err:
                     flash(str(err), "error-add")
+                produtos = Produto.query.all()    
             return render_template("dashboard.html", nome=nome, cargo=cargo, produtos=produtos, usuarios=usuarios, Resultado=produtos, UserLogado=UserLogado,active_section="gerEstoque")
 
         # Se for uma exclusão de produto
