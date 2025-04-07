@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sistema de Estoque</title>
+    <script>
+        function toggleContent(content) {
+            const contents = document.getElementsByClassName("content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.add("hidden");
+            }
+            document.getElementById(content).classList.remove("hidden");
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+        // Captura todos os formulários
+            const forms = document.querySelectorAll("form");
+    
+            forms.forEach(form => {
+                form.addEventListener("submit", function () {
+                // Define o valor do input oculto com a aba ativa
+                    document.getElementById("sectionInput").value = localStorage.getItem("activeSection");
+                });
+            });
+        
+            // Mantém a aba ativa ao recarregar a página
+            let activeSection = localStorage.getItem("activeSection") || "estoque";
+            toggleContent(activeSection);
+        });
+        function toggleContent(content) {
+            const contents = document.getElementsByClassName("content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.add("hidden");
+            }
+            document.getElementById(content).classList.remove("hidden");
+
+            // Salva a aba ativa no localStorage
+            localStorage.setItem("activeSection", content);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let activeSection = "{{ active_section }}";
+            toggleContent(activeSection);
+        });
+
+
+
+    </script>
+</head>   
+<body>
+    <div class="w-full h-full bg-gray-100 flex flex-row gap-6 p-6">
+        <!-- Sidebar -->
+        <div class="w-1/6 h-[780px] bg-white rounded-2xl shadow-2xl p-4 flex flex-col"> 
+
+
+
+            <div class="w-full bg-white rounded-2xl shadow-lg p-2 flex flex-col items-center gap-4">
+                <!-- Círculo para a imagem -->
+                <div class="w-24 h-24 bg-gray-300 rounded-full overflow-hidden">
+                    <img src="{{ url_for('static', filename='img/perfil2.png') }}" alt="Perfil" class="w-full h-full object-cover">
+                </div>
+                
+            
+                <!-- Nome do usuário -->
+                <h2 class="text-xl font-semibold text-gray-800">{{nome}}</h2>
+            
+                <!-- Cargo -->
+                <p class="text-gray-500 text-sm">{{cargo}}</p>
+
+            </div> 
+
+
+            <div class="flex flex-col gap-20 p-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-blue-500">Menu 🧑‍💻</h1>
+            
+                    <ul class="mt-4 flex flex-col gap-4">
+                        <li class="mb-2">
+                            <a href="javascript:void(0)" onclick="toggleContent('gerEstoque')" class="text-blue-500 hover:text-blue-700">Ger. Estoque</a>
+                        </li>
+                        <li class="mb-2"> 
+                            <a href="javascript:void(0)" onclick="toggleContent('estoque')" class="text-blue-500 hover:text-blue-700">Estoque</a>
+                            
+                        </li>
+                        <li class="mb-2">
+                            <a href="javascript:void(0)" onclick="toggleContent('pedidos')" class="text-blue-500 hover:text-blue-700">Pedidos</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="javascript:void(0)" onclick="toggleContent('Perfil')" class="text-blue-500 hover:text-blue-700">Perfil</a>
+                        </li> 
+                        <li class="mb-2">
+                            <a href="javascript:void(0)" onclick="toggleContent('user')" class="text-blue-500 hover:text-blue-700">Usuários</a>
+                        </li>   
+
+                    </ul>
+                </div> 
+            </div> 
+
+            <!-- Botão de Sair com imagem e texto -->
+            <div class="w-15 h-10 bg-blue-500 rounded-full flex flex-col items-center justify-center shadow-lg cursor-pointer hover:bg-blue-200 transition"onclick="window.location.href='{{ url_for('logout') }}'">
+                <!-- Ícone de Sair -->
+                <p class="text-white text-lg flex items-center justify-center gap-2">Sair</p>
+
+            </div>
+            
+        </div>
+
+        <!-- Main Content -->
+        <div class="w-full min-h-[90vh] flex flex-col gap-6">
+            <!-- Header -->
+            <div class="w-full min-h-[5vh] bg-blue-500 rounded-2xl shadow-lg flex items-center justify-center">
+                <h1 class="text-3xl font-bold text-white">📦 Sistema de Estoque</h1> 
+                <p></p>
+            </div>
+
+            <!-- Content Section -->
+            <div class="w-full h-full bg-white rounded-2xl shadow-2xl flex flex-col items-center justify-start gap-6 p-6">
+    
+                <div id="estoque" class="content w-full h-full flex flex-col gap-6 hidden">
+                    <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Estoque</h1>
+                    <!-- Tabela -->
+                    <div class="w-full h-[600px] flex-grow overflow-auto">
+                        <table class="w-full border-collapse border border-gray-300">
+                            <thead class="bg-blue-500 text-white">
+                                <tr>
+                                    <th class="border border-gray-300 px-2 py-2">Nome</th>
+                                    <th class="border border-gray-300 px-2 py-2">Código</th>
+                                    <th class="border border-gray-300 px-2 py-2">Quantidade</th>
+                                    <th class="border border-gray-300 px-2 py-2">Peso (Kg)</th>
+                                    <th class="border border-gray-300 px-2 py-2">Categoria</th>
+                                    <th class="border border-gray-300 px-2 py-2">Preço (R$)</th>
+                                    <th class="border border-gray-300 px-2 py-2">Fornecedor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for produto in produtos %}
+                                <tr class="hover:bg-gray-100">
+                                    <td class="border border-gray-300 px-2 py-2">{{ produto.nome }}</td>
+                                    <td class="border border-gray-300 px-2 py-2">{{ produto.codigo }}</td>
+                                    <td class="border border-gray-300 px-2 py-2">{{ produto.quantidade }}</td>
+                                    <td class="border border-gray-300 px-2 py-2">{{ produto.peso }}</td>
+                                    <td class="border border-gray-300 px-2 py-2">{{ produto.categoria }}</td>
+                                    <td class="border border-gray-300 px-2 py-2">{{ produto.preco }}</td>
+                                    <td class="border border-gray-300 px-2 py-2">{{ produto.fornecedor }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Seção Ger. Estoque (exemplo de outra seção) -->
+                <div id="gerEstoque" class="content w-full h-full flex flex-col gap-6">
+                    <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Gerenciamento de Estoque</h1> 
+                
+                    <div class="w-full flex flex-col gap-10 ">
+                        <div class="w-full flex flex-row gap-6">
+                            <div class="w-1/2 flex flex-col gap-5">      
+                                <!-- Formulário de busca -->
+                                <form id="busca-form" method="POST" class="bg-white p-3 rounded shadow-lg flex flex-col gap-2 w-full mx-auto"> 
+                                    <h1 class="text-3xl font-bold text-blue-400 mb-2">Buscar Produto</h1>
+                                    
+                                
+                                    <label for="categoria" class="text-lg font-medium text-gray-700">Selecione um critério de busca:</label>
+                                    <select id="categoria" name="Busca" class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3 required"> 
+                                        <option value="" selected disabled>Selecione um critério de busca</option>
+                                        <option value="codigo">Código</option>
+                                        <option value="nome">Nome</option>
+                                        <option value="categoria">Categoria</option>
+                                        <option value="fornecedor">Fornecedor</option>
+                                    </select> 
+    
+                                    <!-- Campo oculto para determinar o tipo de ação -->
+                                    <input type="hidden" name="action" value="buscar">
+                                
+                                    <!-- Campo para inserir o valor da busca -->
+                                    <label for="valor_busca" class="text-lg font-medium text-gray-700">Valor de Busca:</label>
+                                    <input type="text" name="valor_busca" class="p-2 border border-gray-300 rounded mb-3" placeholder="Digite o valor de busca" required>
+                                
+                                    <button type="submit" class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                        Buscar
+                                    </button>
+                                </form>
+                    
+                                <div class="bg-white p-5 rounded shadow-lg flex flex-col gap-2 w-full mx-auto h-[307px]">
+                                    <h1 class="text-3xl font-bold text-blue-400">Produtos:</h1>
+                    
+                                    <!-- Exibe mensagens flash -->
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                        <div class="flash-messages">
+                                            {% for category, message in messages %}
+                                                {% if category == 'success' or category == 'error' %}
+                                                    <div class="alert alert-{{ category }} 
+                                                        {% if category == 'success' %}
+                                                            text-blue-500
+                                                        {% elif category == 'error' %}
+                                                            text-red-500
+                                                        {% endif %}">
+                                                        {{ message }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% endwith %}
+    
+                                    <div class="w-full h-[222px] flex-grow overflow-auto">
+                                        <table class="w-full border-collapse border border-gray-300">
+                                            <tbody>
+                                                {% for resultado in Resultado %}
+                                                <tr class="hover:bg-gray-100">
+                                                    <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
+                                                    <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
+                                                    <td class="border border-gray-300 px-2 py-2">{{ resultado.quantidade }}</td>
+                                                    <td class="border border-gray-300 px-2 py-2">{{ resultado.peso }}</td>
+                                                    <td class="border border-gray-300 px-2 py-2">{{ resultado.categoria }}</td>
+                                                    <td class="border border-gray-300 px-2 py-2">{{ resultado.preco }}</td>
+                                                    <td class="border border-gray-300 px-2 py-2">{{ resultado.fornecedor }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                
+                            </div>
+                    
+                            <div class="w-1/2 h-full flex flex-col gap-6"> 
+                                <!-- Formulário para adicionar produto -->
+                                <form id="Adicionar-form" method="POST"  class="bg-white p-3 rounded shadow-lg flex flex-col gap-2 w-full mx-auto"> 
+                                    <h1 class="text-3xl font-bold text-blue-400 mb-3">Adicionar produtos</h1>
+    
+                                    <!-- Exibe mensagens flash -->
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                        <div class="flash-messages">
+                                            {% for category, message in messages %}
+                                                {% if category == 'success-add' or category == 'error-add' %}
+                                                    <div class="alert alert-{{ category }} 
+                                                        {% if category == 'success-add' %}
+                                                            text-blue-500
+                                                        {% elif category == 'error-add' %}
+                                                            text-red-500
+                                                        {% endif %}">
+                                                        {{ message }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% endwith %}
+                    
+                                    <label for="nome" class="text-lg font-medium text-gray-700">Nome</label>
+                                    <input type="text" name="nome" class="border p-2 rounded w-full" placeholder="Nome" required>  
+                    
+                    
+                                    <label for="quantidade" class="text-lg font-medium text-gray-700">Quantidade</label>
+                                    <input type="Number" name="quantidade" class="border p-2 rounded w-full" placeholder="Quantidade" required>
+                    
+                                    <label for="peso" class="text-lg font-medium text-gray-700">Peso</label>
+                                    <input type="text" name="peso" class="border p-2 rounded w-full" placeholder="Peso" required>
+                    
+                                    <label for="categoria" class="text-lg font-medium text-gray-700">Categoria</label>
+                                    <input type="text" name="categoria" class="border p-2 rounded w-full" placeholder="Categoria" required>
+                    
+                                    <label for="preco" class="text-lg font-medium text-gray-700">Preço</label>
+                                    <input type="Number" name="preco" class="border p-2 rounded w-full" placeholder="Preço" required>
+                    
+                                    <label for="fornecedor" class="text-lg font-medium text-gray-700">Fornecedor</label>
+                                    <input type="text" name="fornecedor" class="border p-2 rounded w-full" placeholder="Fornecedor" required>
+    
+                                     <!-- Campo oculto para determinar o tipo de ação -->
+                                    <input type="hidden" name="action" value="adicionar">
+                    
+                                    <button type="submit" class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                        Confirmar!
+                                    </button>
+                                </form>  
+                            </div>
+                        </div> 
+                        <div class="w-full">
+                            <div class="w-full h-full flex flex-col gap-6">
+                                <!-- Formulário para apagar produto -->
+                                <form id="Apagar-form" method="POST"  class="bg-white p-3 rounded shadow-lg flex flex-col gap-2 w-full mx-auto">
+                                    <h1 class="text-3xl font-bold text-blue-400 mb-2">Apagar produto</h1>  
+
+
+                                    <!-- Exibe mensagens flash -->
+                                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                        <div class="flash-messages">
+                                            {% for category, message in messages %}
+                                                {% if category == 'success-del' or category == 'error-del' %}
+                                                    <div class="alert alert-{{ category }} 
+                                                        {% if category == 'success-del' %}
+                                                            text-blue-500
+                                                        {% elif category == 'error-del' %}
+                                                            text-red-500
+                                                        {% endif %}">
+                                                        {{ message }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% endwith %}
+
+
+                                    
+                                    <label for="codigo" class="text-lg font-medium text-gray-700">Código do produto</label>
+
+                                    <input type="text" name="codigoApagar" class="border p-2 rounded w-full" placeholder="Código do produto" required>   
+
+                                    <label for="quant" class="text-lg font-medium text-gray-700">Quantidade:</label>
+
+                                    <input type="number" name="quantapagar" class="border p-2 rounded w-full" placeholder="Qualtidade" required> 
+
+                                    <!-- Campo oculto para determinar o tipo de ação -->
+                                    <input type="hidden" name="action" value="apagar">
+                                    
+                                    <button type="submit" class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                                        Apagar!
+                                    </button>
+                                </form>
+ 
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+                
+
+                <!-- Seção Pedidos -->
+                <div id="pedidos" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6">
+                    <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Pedidos</h1>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    <div class="flash-messages">
+                                        {% for category, message in messages %}
+                                            {% if category == 'errocar' or category == 'successcar' %}
+                                                <div class="alert alert-{{ category }} 
+                                                    {% if category == 'successcar' %}
+                                                        text-blue-500
+                                                    {% elif category == 'errocar' %}
+                                                        text-red-500
+                                                    {% endif %}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
+
+                    <!-- Campo para inserir código do pedido -->
+                    <div class="flex flex-row gap-10 w-full">
+                        <div class="w-1/2 flex flex-col gap-4 bg-white shadow-lg p-4 rounded-lg h-[600px] gap-6">
+                            
+                            <form id="FormPedido" method="POST" class="flex flex-col gap-6">
+
+                                <label for="codigoProCarrinho" class="text-blue-500 font-bold text-3xl">Código do Produto</label>
+                                <input type="text" id="codigoProCarrinho" name="codigoProCarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o código">
+
+                                <label for="quantidadeProcarrinho" class="text-blue-500 font-bold text-3xl">Quantidade que deseja:</label>
+                                <input type="number" id="quantidadeProcarrinho" name="quantidadeProcarrinho" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite a quantidade">
+
+                                <input type="hidden" name="action" value="carrinho"> 
+
+                                <input type="hidden" name="section" id="sectionInput">
+
+                                <button type="submit"  class="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">Adicionar</button>
+
+                            </form>
+
+                            <div class="w-full h-[150px] flex-grow overflow-auto">
+                                <table class="w-full border-collapse border border-gray-300">
+                                    <tbody>
+                                        {% for resultado in produtos %}
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.quantidade }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.peso }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.categoria }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.preco }}</td>
+                                            <td class="border border-gray-300 px-2 py-2">{{ resultado.fornecedor }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+    
+                        </div>
+    
+                        <!-- Carrinho de pedidos -->
+                        <div class="w-1/2 bg-white p-4 rounded-lg shadow-lg flex flex-col gap-3">
+                            <h2 class="text-blue-500 text-3xl font-bold">Carrinho de Pedidos</h2>
+                            <!-- Contêiner da tabela com scroll ativado -->
+                            <div class="overflow-y-auto" style="max-height: 300px;"> <!-- Ajuste a altura conforme necessário -->
+                                {% if carrinhodeProdutos == [] %}
+                                    <div class="flex flex-col items-center justify-center py-4">
+                                        <img class="h-60 w-60" src="{{ url_for('static', filename='img/8.png') }}" alt="Imagem de perfil">  
+                                        <p class="text-blue-500 font-bold mt-2">Seu carrinho está vazio</p>
+                                        
+                                    </div>
+                                {% else %}
+                                    <table class="w-full border-collapse border border-gray-300">
+                                        <tbody>
+                                            {% for resultado in carrinhodeProdutos %}
+                                            <tr class="hover:bg-gray-100">
+                                                <td class="border border-gray-300 px-2 py-2">{{ resultado.nome }}</td>
+                                                <td class="border border-gray-300 px-2 py-2">{{ resultado.codigo }}</td>
+                                                <td class="border border-gray-300 px-2 py-2">{{ resultado.quantidade }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+                            </div>
+
+                            <div class="w-full flex flex-col gap-5">
+                                <!-- Formulário com input number e botão retirar -->
+                                <form method="POST" class="flex flex-col gap-4">
+                                    <!-- Campo de número -->
+                                    <div class="flex flex-col gap-4">
+                                        <label for="alterarPedido" class="text-2xl font-bold text-blue-500">Linha que Deseja retirar</label>
+                                        <input type="number" name="alterarPedido" class="mt-1 block w-24 w-full py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 p-2" min="0" placeholder="Eliminar produto"> 
+                                        <input type="hidden" name="action" value="alterar">
+                                    </div>
+
+                                    <!-- Botão retirar -->
+                                    <div>
+                                        <button type="submit" class="w-full py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-700">Retirar</button>
+                                    </div>
+                                </form> 
+                                <form method="POST">
+                                    <!-- Campo oculto para passar a ação -->
+                                    <input type="hidden" name="action" value="Confirmar">                                
+                                    <!-- Botão de enviar -->
+                                    <button class="w-full h-10 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition"  type="submit">Confirmar Pedido</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- Seção Perfil -->
+                <div id="Perfil" class="content w-full h-full hidden flex flex-col items-center gap-6 p-6 bg-white">
+                    <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Seu perfil</h1>
+
+                    <div class="w-full h-full bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col gap-4">
+                        <div class="flex flex-col">
+                            <label class="text-blue-500 font-semibold text-lg">Nome Completo</label>
+                            <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-nome">{{UserLogado.UserName}}</div>
+                        </div>
+
+                        <div class="w-full flex flex-row gap-6">
+                            <div class="flex flex-col w-1/2">
+                                <label class="text-blue-500 font-semibold text-lg">Usuário</label>
+                                <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-usuario">{{UserLogado.Login}}</div>
+                            </div>
+
+                            <div class="flex flex-col w-1/2">
+                                <label class="text-blue-500 font-semibold text-lg">Cargo</label>
+                                <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-cargo">{{UserLogado.Cargo}}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col">
+                            <label class="text-blue-500 font-semibold text-lg">ID</label>
+                            <div class="p-3 bg-white rounded-lg shadow-sm text-gray-800" id="perfil-id">{{UserLogado.UserId}}</div>
+                        </div>
+
+                        <div class="w-full flex flex-row items-center justify-center gap-20">
+                            <div class="flex flex-col items-center justify-center mt-10">
+                                <img class="h-56 w-56 rounded-full shadow-lg" src="{{ url_for('static', filename='img/4.png') }}" alt="Imagem de perfil">
+                                <p class="text-gray-700 font-semibold mt-2">Proatividade</p>
+                            </div>
+                            <div class="flex flex-col items-center justify-center mt-10">
+                                <img class="h-56 w-56 rounded-full shadow-lg" src="{{ url_for('static', filename='img/5.png') }}" alt="Imagem de perfil">
+                                <p class="text-gray-700 font-semibold mt-2">Comunicação</p>
+                            </div>
+                            <div class="flex flex-col items-center justify-center mt-10">
+                                <img class="h-56 w-56 rounded-full shadow-lg" src="{{ url_for('static', filename='img/6.png') }}" alt="Imagem de perfil">
+                                <p class="text-gray-700 font-semibold mt-2">Escolhas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+
+
+                <!-- Seção Usuários -->
+                <div id="user" class="content w-full h-full hidden flex flex-col gap-6">
+                    <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Usuários</h1>
+                    <!-- Adicione aqui o conteúdo para usuários --> 
+                    <div class="w-full h-full p-6 flex flex-col gap-6">
+                        <table class="auto border-collapse border border-gray-300 h-1/2 overflow-y-auto">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="border border-gray-300 px-4 py-2">ID</th>
+                                    <th class="border border-gray-300 px-4 py-2">Nome</th> 
+                                    <th class="border border-gray-300 px-4 py-2">Cargo</th>
+                                </tr>
+                            </thead>
+                            <tbody class="h-1/5 overflow-y-auto">
+                                {% for usuario in usuarios %}
+                                <tr class="hover:bg-gray-100">
+                                    <td class="border border-gray-300 px-4 py-2">{{ usuario.UserId }}</td>  
+                                    <td class="border border-gray-300 px-4 py-2">{{ usuario.UserName }}</td>  
+                                    <td class="border border-gray-300 px-4 py-2">{{ usuario.Cargo }}</td>  
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="border border-gray-300 px-4 py-2 text-center text-red-500">
+                                        Nenhum usuário encontrado.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table> 
+                        <form method="POST" class="w-full flex flex-col gap-4 h-1/2"> 
+
+                            <h1 class="text-2xl font-bold text-gray-500 w-full text-center">Apagar Usuário</h1> 
+
+
+                            <label for="apagarUser" class="text-blue-500 font-bold text-xl">ID do Usuário</label>
+                            <!-- Exibe mensagens flash -->
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <div class="flash-messages">
+                                    {% for category, message in messages %}
+                                        {% if category == 'apagado' or category == 'napagado' %}
+                                            <div class="alert alert-{{ category }} 
+                                                {% if category == 'apagado' %}
+                                                    text-blue-500
+                                                {% elif category == 'napagado' %}
+                                                    text-red-500
+                                                {% endif %}">
+                                                {{ message }}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% endwith %}
+                            <input type="number" id="apagarUser" name="userId" class="p-3 border rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-400" placeholder="Digite o ID do usuário" required>
+                            <input type="hidden" name="action" value="apagarUser">
+                            <input type="hidden" name="section" id="sectionInput">
+                            <button type="submit" class="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+                                Enviar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
